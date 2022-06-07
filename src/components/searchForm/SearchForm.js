@@ -6,10 +6,9 @@ import ErrorMessage from '../errorMessage/ErrorMessage'
 import * as Yup from 'yup'
 import './searchForm.scss';
 
-
 const SearchForm = () => { 
 
-    const {loading, error, getCharByName, clearError} = useMarvelService();
+    const {getCharByName, clearError, process, setProcess} = useMarvelService();
     const [char, setChar] = useState(null);
 
     const onCharLoaded = (char) => {
@@ -20,10 +19,11 @@ const SearchForm = () => {
         clearError();
 
         getCharByName(name)
-            .then(onCharLoaded);
+            .then(onCharLoaded)
+            .then(() => setProcess('success'))
     }
 
-    const errorMessage = error ? <div className="char__search-critical-error"><ErrorMessage/></div> : null;
+    const errorMessage = process === 'error' ? <div className="char__search-critical-error"><ErrorMessage/></div> : null;
     
     const results = !char ? null : char.length > 0 ?
                     <div className="char__search-wrapper">
@@ -59,7 +59,7 @@ const SearchForm = () => {
                     <button 
                         className='button button__main' 
                         type="submit" 
-                        disabled={loading}>
+                        disabled={process === 'loading'}>
                             <div className="inner">Find</div>
                     </button>
                 </div>
