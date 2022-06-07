@@ -1,44 +1,74 @@
-import { Component } from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { lazy, Suspense } from 'react';
 import AppHeader from "../appHeader/AppHeader";
-import RandomChar from "../randomChar/RandomChar";
-import CharList from "../charList/CharList";
-import CharInfo from "../charInfo/CharInfo";
-import ErrorBoundary from "../errorBoundary/ErrorBoundary";
+import Spinner from "../spinner/Spinner";
+const MainPage = lazy (() => import('../pages/MainPage'))
+const ComicsPage = lazy(() => import('../pages/ComicsPage'))
+const PageError = lazy(() => import('../pages/404'))
+const SinglePage = lazy(() => import('../pages/SinglePage'))
+const SingleComicLayout = lazy(() => import('../pages/singleComicLayout/SingleComicLayout'));
+const SingleCharacterLayout = lazy(() => import('../pages/singleCharacterLayout/SingleCharacterLayout'));
 
-import decoration from '../../resources/img/vision.png';
+// {
+//     routesMassive.map(
+//         ({path, element}) => {                                                             
+//             return <Route path={path} element={element}/>
+//         }
+//     )
+// }  
 
-class App extends Component {
-    state = {
-        selectedChar: null
-    }
 
-    onCharSelected = (id) => {
-        this.setState({
-            selectedChar: id
-        })
-    }
+// const routesMassive = [
+//     {path: "/", element: <MainPage/>},
+//     {path: "/comics", element: <ComicsPage/>},
+//     {path: "/comics/:comicId", element:<SingleComicPage/>},                      
+//     {path: "*", element: <PageError/>}
+// ]
 
-    render() {
-        return (
-            <div className="app">
+// const Content = () => {
+//     let location = useLocation();
+
+//     return (
+//         <div className="app">            
+//                 <AppHeader/>
+//                 <main>
+//                     <Suspense fallback={<Spinner/>}>
+//                         <TransitionGroup component={null}>
+//                             <CSSTransition key={location.key} classNames="opacity" timeout={300}>
+//                                 <Routes location={location}>
+//                                     <Route path="/" element={<MainPage/>}/>                            
+//                                     <Route path="/comics" element={<ComicsPage/>}/>
+//                                     <Route path="/comics/:comicId" element={<SingleComicPage/>}/>
+//                                     <Route path="*" element={<PageError/>}/>
+//                                 </Routes> 
+//                             </CSSTransition>   
+//                         </TransitionGroup>                    
+//                     </Suspense>                  
+//                 </main>       
+//             </div>
+//     )
+// }
+
+const App = () => {
+    return (
+      <Router>
+            <div className="app">            
                 <AppHeader/>
                 <main>
-                    <ErrorBoundary>
-                        <RandomChar/>
-                    </ErrorBoundary>
-                    <div className="char__content">
-                        <ErrorBoundary>
-                            <CharList onCharSelected={this.onCharSelected}/>
-                        </ErrorBoundary>
-                        <ErrorBoundary>
-                            <CharInfo charId={this.state.selectedChar}/>    
-                        </ErrorBoundary>
-                    </div>
-                    <img className="bg-decoration" src={decoration} alt="vision"/>
-                </main>
+                    <Suspense fallback={<Spinner/>}>                        
+                        <Routes >
+                            <Route path="/" element={<MainPage/>}/>                            
+                            <Route path="/comics" element={<ComicsPage/>}/>
+                            <Route path="/comics/:id" element={<SinglePage Component={SingleComicLayout} dataType='comic'/>}/>
+                            <Route path="/characters/:id" element={<SinglePage Component={SingleCharacterLayout} dataType='character'/>}/>
+                            <Route path="*" element={<PageError/>}/>
+                        </Routes>                   
+                    </Suspense>                  
+                </main>                   
             </div>
-        )
-    }    
+      </Router>
+    )       
 }
+
 
 export default App;
